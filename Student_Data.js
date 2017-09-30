@@ -19,3 +19,11 @@ var restify = require('restify')
   console.log(' /students')
   console.log(' /students/:id')  
 })
+
+server
+// Allow the use of POST
+.use(restify.fullResponse())
+
+// Maps req.body to req.params so there is no switching between them
+.use(restify.bodyParser())
+
