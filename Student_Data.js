@@ -28,7 +28,7 @@ server
 .use(restify.bodyParser())
 
 
-// Create a new user
+// Create a new student record
 server.post('/sendPost', function (req, res, next) {
     
         console.log("sendPost: sending response...");
@@ -60,7 +60,7 @@ server.post('/sendPost', function (req, res, next) {
       })
     })
 
-    // Update a user by their id
+    // Update a Student Record by their id
     server.put('/students/:id', function (req, res, next) {
       
         // Make sure name is defined
@@ -80,7 +80,7 @@ server.post('/sendPost', function (req, res, next) {
           }
         
         // Update the user with the persistence engine
-        studentsSave.update(newStudent, function (error, students) {
+        studentsSave.update(newStudent, function (error, student) {
       
           // If there are any errors, pass them to next in the correct format
           if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
