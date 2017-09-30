@@ -2,6 +2,10 @@ var SERVER_NAME = 'Student-api'
 var PORT = 3000;
 var HOST = '127.0.0.1';
 
+var getRequestCounter = 0;
+var postRespnseCounter = 0;
+
+
 var restify = require('restify')
 
   // Get a persistence engine for the users
@@ -34,6 +38,10 @@ server
     
         console.log("sendPost: sending response...");
       
+        postResponseCounter++;
+        
+        console.log("Processed Request Counter -> sendGet : " + getRequestCounter + "sendPost : " + postRespnseCounter);
+          
       // Make sure name is defined
       if (req.params.name === undefined ) {
         // If there are any errors, pass them to next in the correct format
@@ -67,6 +75,11 @@ server
   
         console.log("sendGet: received request..");
 
+        getRequestCounter++;
+        
+        console.log("Processed Request Counter -> sendGet : " + getRequestCounter + "sendPost : " + postRespnseCounter);
+          
+
         // Find every entity within the given collection
         studentsSave.find({}, function (error, students) {
 
@@ -80,7 +93,7 @@ server
 //------------------------------------------------------------------------------//
 
       server.get('/Students/:id', function (req, res, next) {
-    
+
         // Find a single user by their id within save
         studentsSave.findOne({ _id: req.params.id }, function (error, students) {
     
