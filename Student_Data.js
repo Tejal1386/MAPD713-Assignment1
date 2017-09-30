@@ -59,3 +59,34 @@ server.post('/sendPost', function (req, res, next) {
         res.send(201, student)
       })
     })
+
+    // Update a user by their id
+    server.put('/students/:id', function (req, res, next) {
+      
+        // Make sure name is defined
+        if (req.params.name === undefined ) {
+          // If there are any errors, pass them to next in the correct format
+          return next(new restify.InvalidArgumentError('name must be supplied'))
+        }
+        if (req.params.age === undefined ) {
+          // If there are any errors, pass them to next in the correct format
+          return next(new restify.InvalidArgumentError('age must be supplied'))
+        }
+        
+        var newStudent = {
+              _id: req.params.id,
+              name: req.params.name, 
+              age: req.params.age
+          }
+        
+        // Update the user with the persistence engine
+        studentsSave.update(newStudent, function (error, students) {
+      
+          // If there are any errors, pass them to next in the correct format
+          if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+      
+          // Send a 200 OK response
+          res.send(200)
+        })
+      })
+      
