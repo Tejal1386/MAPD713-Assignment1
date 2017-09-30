@@ -27,3 +27,35 @@ server
 // Maps req.body to req.params so there is no switching between them
 .use(restify.bodyParser())
 
+
+// Create a new user
+server.post('/sendPost', function (req, res, next) {
+    
+        console.log("sendPost: sending response...");
+
+       
+        
+      // Make sure name is defined
+      if (req.params.name === undefined ) {
+        // If there are any errors, pass them to next in the correct format
+        return next(new restify.InvalidArgumentError('name must be supplied'))
+      }
+      if (req.params.age === undefined ) {
+        // If there are any errors, pass them to next in the correct format
+        return next(new restify.InvalidArgumentError('age must be supplied'))
+      }
+      var newStudent = {
+            name: req.params.name, 
+            age: req.params.age
+        }
+    
+      // Create the user using the persistence engine
+      studentsSave.create( newStudent, function (error, student) {
+    
+        // If there are any errors, pass them to next in the correct format
+        if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+    
+        // Send the user if no issues
+        res.send(201, student)
+      })
+    })
