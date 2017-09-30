@@ -1,0 +1,12 @@
+{
+    "name": "User-Api",
+    "version": "1.0.0",
+    "description": "REST API - Students",
+    "dependencies": {
+        "restify": "4.1.1",
+        "save": "2.3.0"
+    },
+    "author": "Tejal",
+	"private": true,
+	"main": "Student_Data.js"
+}
