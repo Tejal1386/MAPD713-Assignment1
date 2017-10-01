@@ -2,6 +2,11 @@ var SERVER_NAME = 'Student-api'
 var PORT = 3000;
 var HOST = '127.0.0.1';
 
+var filename = 'Data_Storage.json';
+var fs = require('fs');
+var data = fs.readFileSync('Data_Storage.json');
+var student_data = JSON.parse(data);
+
 var getRequestCounter = 0;
 var postRespnseCounter = 0;
 
@@ -17,8 +22,16 @@ var restify = require('restify')
   server.listen(PORT, HOST, function () {
   //console.log('Server %s listening at %s', server.name, server.url)
   console.log("Server is listening on: " + HOST + ":" + PORT);
+  console.log("End Points :");
+  console.log( HOST + ":" + PORT +"/sendGet   method: GET");
+  console.log( HOST + ":" + PORT +"/sendPost   method: POST");
+  console.log( HOST + ":" + PORT +"/sendDelete   method: DELETE");
   
-  
+  var data = fs.readFileSync(filename);
+  var student_data = JSON.parse(data);
+    
+  console.log(student_data);
+
   console.log('Resources:')
   console.log(' /students')
   console.log(' /students/:id')  
@@ -38,9 +51,10 @@ server
     
         console.log("sendPost: sending response...");
       
-        postResponseCounter++;
+        //Request counter for sendPostrequest 
+        postRespnseCounter++;
         
-        console.log("Processed Request Counter -> sendGet : " + getRequestCounter + "sendPost : " + postRespnseCounter);
+        console.log("Processed Request Counter -> sendGet : " + getRequestCounter + ", sendPost : " + postRespnseCounter);
           
       // Make sure name is defined
       if (req.params.name === undefined ) {
@@ -59,6 +73,12 @@ server
       // Create the user using the persistence engine
       studentsSave.create( newStudent, function (error, student) {
     
+        //Writing data in JSON file
+        var data = JSON.stringify(newStudent,null,2);
+        fs.writeFile(filename,data,finished);
+
+        function finished(err) {console.log('Data stored in json file');}
+
         // If there are any errors, pass them to next in the correct format
         if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     
@@ -75,9 +95,10 @@ server
   
         console.log("sendGet: received request..");
 
+        //Request counter for endpoint sendGet 
         getRequestCounter++;
         
-        console.log("Processed Request Counter -> sendGet : " + getRequestCounter + "sendPost : " + postRespnseCounter);
+        console.log("Processed Request Counter -> sendGet : " + getRequestCounter + ", sendPost : " + postRespnseCounter);
           
 
         // Find every entity within the given collection
@@ -85,8 +106,13 @@ server
 
         // Return all of the users in the system
         res.send(students)
-        })
-      })
+
+        //reading JSON file data and print on console 
+         data = fs.readFileSync(filename);
+         student_data = JSON.parse(data);
+         console.log(student_data);
+       })
+    })
 
 //------------------------------------------------------------------------------//
                       // Get a single user by their student id
