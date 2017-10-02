@@ -111,12 +111,12 @@ server.post('/sendPost', function (req, res, next) {
         studentsSave.find({}, function (error, students) {
 
         // Return all of the Students in the system
-        res.send(students)
+        //res.send(students)
 
 
         console.log(student_data_JSON);
 
-        // res.send(student_data_JSON);
+         res.send(student_data_JSON);
 
        })
     })
