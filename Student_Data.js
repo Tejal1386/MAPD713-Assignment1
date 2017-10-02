@@ -4,8 +4,10 @@ var HOST = '127.0.0.1';
 
 var filename = 'Data_Storage.json';
 var fs = require('fs');
-var data = fs.readFileSync('Data_Storage.json');
-var student_data = JSON.parse(data);
+
+var data = fs.readFileSync(filename);
+var student_data_JSON = JSON.parse(data);
+
 
 var getRequestCounter = 0;
 var postRespnseCounter = 0;
@@ -27,10 +29,7 @@ var restify = require('restify')
   console.log( HOST + ":" + PORT +"/sendPost   method: POST");
   console.log( HOST + ":" + PORT +"/sendDelete   method: DELETE");
   
-  var data = fs.readFileSync(filename);
-  var student_data = JSON.parse(data);
-    
-  console.log(student_data);
+  console.log(student_data_JSON);
 
   console.log('Resources:')
   console.log(' /students')
@@ -44,48 +43,55 @@ server
 // Maps req.body to req.params so there is no switching between them
 .use(restify.bodyParser())
 
+
 //------------------------------------------------------------------------------//
                        // Create a new student record
 //------------------------------------------------------------------------------//
-      server.post('/sendPost', function (req, res, next) {
+server.post('/sendPost', function (req, res, next) {
+  
+      console.log("sendPost: sending response...");
     
-        console.log("sendPost: sending response...");
+      //Request counter for sendPostrequest 
+      postRespnseCounter++;
       
-        //Request counter for sendPostrequest 
-        postRespnseCounter++;
+      console.log("Processed Request Counter -> sendGet : " + getRequestCounter + ", sendPost : " + postRespnseCounter);
         
-        console.log("Processed Request Counter -> sendGet : " + getRequestCounter + ", sendPost : " + postRespnseCounter);
-          
-      // Make sure name is defined
-      if (req.params.name === undefined ) {
-        // If there are any errors, pass them to next in the correct format
-        return next(new restify.InvalidArgumentError('name must be supplied'))
+    // Make sure name is defined
+    if (req.params.name === undefined ) {
+      // If there are any errors, pass them to next in the correct format
+      return next(new restify.InvalidArgumentError('name must be supplied'))
+    }
+    if (req.params.age === undefined ) {
+      // If there are any errors, pass them to next in the correct format
+      return next(new restify.InvalidArgumentError('age must be supplied'))
+    }
+    var newStudent = { 
+          name: req.params.name, 
+          age: req.params.age,
+          _id: req.params._id
       }
-      if (req.params.age === undefined ) {
-        // If there are any errors, pass them to next in the correct format
-        return next(new restify.InvalidArgumentError('age must be supplied'))
-      }
-      var newStudent = {
-            name: req.params.name, 
-            age: req.params.age
-        }
-    
-      // Create the user using the persistence engine
-      studentsSave.create( newStudent, function (error, student) {
-    
-        //Writing data in JSON file
-        var data = JSON.stringify(newStudent,null,2);
-        fs.writeFile(filename,data,finished);
+  
+    // Create the user using the persistence engine
+    studentsSave.create( newStudent, function (error, student) {
+  
+      //Writing data in JSON file
+
+        student_data_JSON[req.params.name] = req.params.age;
+      
+        var write_data = JSON.stringify(student_data_JSON,null,2);
+
+        fs.writeFile(filename,write_data,finished);
 
         function finished(err) {console.log('Data stored in json file');}
 
-        // If there are any errors, pass them to next in the correct format
-        if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
-    
-        // Send the user if no issues
-        res.send(201, student)
-      })
+      // If there are any errors, pass them to next in the correct format
+      if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+  
+      // Send the user if no issues
+      res.send(201, student)
     })
+  })
+
 
 //------------------------------------------------------------------------------//
                       // Get all student records in the system
@@ -104,13 +110,14 @@ server
         // Find every entity within the given collection
         studentsSave.find({}, function (error, students) {
 
-        // Return all of the users in the system
+        // Return all of the Students in the system
         res.send(students)
 
-        //reading JSON file data and print on console 
-         data = fs.readFileSync(filename);
-         student_data = JSON.parse(data);
-         console.log(student_data);
+
+        console.log(student_data_JSON);
+
+        // res.send(student_data_JSON);
+
        })
     })
 
@@ -135,6 +142,9 @@ server
         }
       })
     })
+
+
+
 
 //------------------------------------------------------------------------------//
                       // Update a Student Record by their id
@@ -195,8 +205,10 @@ server.get('/sendDelete', function (req, res, next) {
         console.log("sendDelete: received request..");
 
         // Find every entity within the given collection
-        studentsSave.delete({}, function (error, students) {
+
+        localStorage.clear();
+        
+         // fs.truncate(filename, 0, function(){console.log('delete.')})
+
  //      Send a 200 OK response
-        res.send(200)
-        })
-      })
+       })
