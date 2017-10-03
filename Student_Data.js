@@ -2,9 +2,10 @@ var SERVER_NAME = 'Student-api'
 var PORT = 3000;
 var HOST = '127.0.0.1';
 
+
+//Read data from json file
 var filename = 'Data_Storage.json';
 var fs = require('fs');
-
 var data = fs.readFileSync(filename);
 var student_data_JSON = JSON.parse(data);
 
@@ -29,8 +30,6 @@ var restify = require('restify')
   console.log( HOST + ":" + PORT +"/sendPost   method: POST");
   console.log( HOST + ":" + PORT +"/sendDelete   method: DELETE");
   
-  console.log(student_data_JSON);
-
   console.log('Resources:')
   console.log(' /students')
   console.log(' /students/:id')  
@@ -69,7 +68,7 @@ server.post('/sendPost', function (req, res, next) {
           name: req.params.name, 
           age: req.params.age,
           _id: req.params._id
-      }
+    }
   
     // Create the user using the persistence engine
     studentsSave.create( newStudent, function (error, student) {
@@ -105,14 +104,9 @@ server.post('/sendPost', function (req, res, next) {
         getRequestCounter++;
         
         console.log("Processed Request Counter -> sendGet : " + getRequestCounter + ", sendPost : " + postRespnseCounter);
-          
 
         // Find every entity within the given collection
         studentsSave.find({}, function (error, students) {
-
-        // Return all of the Students in the system
-        //res.send(students)
-
 
         console.log(student_data_JSON);
 
@@ -130,6 +124,10 @@ server.post('/sendPost', function (req, res, next) {
         // Find a single user by their id within save
         studentsSave.findOne({ _id: req.params.id }, function (error, students) {
     
+        getRequestCounter++;
+          
+        console.log("Processed Request Counter -> sendGet : " + getRequestCounter + ", sendPost : " + postRespnseCounter);
+          
         // If there are any errors, pass them to next in the correct format
         if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     
@@ -166,7 +164,7 @@ server.post('/sendPost', function (req, res, next) {
               _id: req.params.id,
               name: req.params.name, 
               age: req.params.age
-          }
+        }
         
           // Update the user with the persistence engine
           studentsSave.update(newStudent, function (error, student) {
@@ -176,6 +174,8 @@ server.post('/sendPost', function (req, res, next) {
       
           // Send a 200 OK response
           res.send(200)
+          console.log("Update id:"+ req.params.id+ "received request..");
+          
         })
       })
       
@@ -188,6 +188,8 @@ server.del('/students/:id', function (req, res, next) {
     // Delete the user with the persistence engine
     studentsSave.delete(req.params.id, function (error, student) {
   
+      console.log("Delete id:"+ req.params.id+ "received request..");
+      
       // If there are any errors, pass them to next in the correct format
       if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
   
@@ -200,15 +202,12 @@ server.del('/students/:id', function (req, res, next) {
                       // Delete all student records in the system
 //------------------------------------------------------------------------------//
 
-server.get('/sendDelete', function (req, res, next) {
+server.del('/sendDelete', function (req, res, next) {
   
         console.log("sendDelete: received request..");
 
-        // Find every entity within the given collection
-
-        localStorage.clear();
+        studentsSave = require('save')('students')
         
-         // fs.truncate(filename, 0, function(){console.log('delete.')})
-
- //      Send a 200 OK response
-       })
+        res.send("All Records Delete");
+   
+ })

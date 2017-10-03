@@ -1,12 +1,28 @@
 {
-    "name": "User-Api",
+    "name": "Assignment-1",
     "version": "1.0.0",
     "description": "REST API - Students",
+    "scripts": {
+        "test": "restify"
+      },
     "dependencies": {
         "restify": "4.1.1",
         "save": "2.3.0"
     },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Tejal1386/MAPD713-F2017-Assignment-1.git"
+      },
+      "keywords": [
+        "Microservices"
+      ],
     "author": "Tejal",
 	"private": true,
-	"main": "Student_Data.js"
+    "main": "Student_Data.js",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/Tejal1386/MAPD713-F2017-Assignment-1/issues"
+      },
+      "homepage": "https://github.com/Tejal1386/MAPD713-F2017-Assignment-1#readme"
+    
 }
