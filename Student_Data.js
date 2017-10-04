@@ -1,4 +1,4 @@
-var SERVER_NAME = 'Student-api'
+var SERVER_NAME = 'Product-api'
 var PORT = 3000;
 var HOST = '127.0.0.1';
 
@@ -7,7 +7,7 @@ var HOST = '127.0.0.1';
 var filename = 'Data_Storage.json';
 var fs = require('fs');
 var data = fs.readFileSync(filename);
-var student_data_JSON = JSON.parse(data);
+var product_data_JSON = JSON.parse(data);
 
 
 var getRequestCounter = 0;
@@ -17,7 +17,7 @@ var postRespnseCounter = 0;
 var restify = require('restify')
 
   // Get a persistence engine for the users
-  , studentsSave = require('save')('students')
+  , productsSave = require('save')('products')
 
   // Create the restify server
   , server = restify.createServer({ name: SERVER_NAME})
@@ -31,8 +31,8 @@ var restify = require('restify')
   console.log( HOST + ":" + PORT +"/sendDelete   method: DELETE");
   
   console.log('Resources:')
-  console.log(' /students')
-  console.log(' /students/:id')  
+  console.log(' /products')
+  console.log(' /products/:id')  
 })
 
 server
@@ -44,7 +44,7 @@ server
 
 
 //------------------------------------------------------------------------------//
-                       // Create a new student record
+                       // Create a new product record
 //------------------------------------------------------------------------------//
 server.post('/sendPost', function (req, res, next) {
   
@@ -56,28 +56,28 @@ server.post('/sendPost', function (req, res, next) {
       console.log("Processed Request Counter -> sendGet : " + getRequestCounter + ", sendPost : " + postRespnseCounter);
         
     // Make sure name is defined
-    if (req.params.name === undefined ) {
+    if (req.params.product === undefined ) {
       // If there are any errors, pass them to next in the correct format
       return next(new restify.InvalidArgumentError('name must be supplied'))
     }
-    if (req.params.age === undefined ) {
+    if (req.params.price === undefined ) {
       // If there are any errors, pass them to next in the correct format
       return next(new restify.InvalidArgumentError('age must be supplied'))
     }
-    var newStudent = { 
-          name: req.params.name, 
-          age: req.params.age,
+    var newproduct = { 
+          product: req.params.product, 
+          price: req.params.price,
           _id: req.params._id
     }
   
     // Create the user using the persistence engine
-    studentsSave.create( newStudent, function (error, student) {
+    productsSave.create( newproduct, function (error, product) {
   
       //Writing data in JSON file
 
-        student_data_JSON[req.params.name] = req.params.age;
+        product_data_JSON[req.params.product] = req.params.price;
       
-        var write_data = JSON.stringify(student_data_JSON,null,2);
+        var write_data = JSON.stringify(product_data_JSON,null,2);
 
         fs.writeFile(filename,write_data,finished);
 
@@ -87,13 +87,13 @@ server.post('/sendPost', function (req, res, next) {
       if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
   
       // Send the user if no issues
-      res.send(201, student)
+      res.send(201, product)
     })
   })
 
 
 //------------------------------------------------------------------------------//
-                      // Get all student records in the system
+                      // Get all product records in the system
 //------------------------------------------------------------------------------//
 
         server.get('/sendGet', function (req, res, next) {
@@ -106,23 +106,21 @@ server.post('/sendPost', function (req, res, next) {
         console.log("Processed Request Counter -> sendGet : " + getRequestCounter + ", sendPost : " + postRespnseCounter);
 
         // Find every entity within the given collection
-        studentsSave.find({}, function (error, students) {
+        productsSave.find({}, function (error, products) {
 
-        console.log(student_data_JSON);
-
-         res.send(student_data_JSON);
+         res.send(products);
 
        })
     })
 
 //------------------------------------------------------------------------------//
-                      // Get a single user by their student id
+                      // Get a single user by their product id
 //------------------------------------------------------------------------------//
 
-      server.get('/Students/:id', function (req, res, next) {
+      server.get('/products/:id', function (req, res, next) {
 
         // Find a single user by their id within save
-        studentsSave.findOne({ _id: req.params.id }, function (error, students) {
+        productsSave.findOne({ _id: req.params.id }, function (error, products) {
     
         getRequestCounter++;
           
@@ -131,9 +129,9 @@ server.post('/sendPost', function (req, res, next) {
         // If there are any errors, pass them to next in the correct format
         if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
     
-        if (students) {
+        if (products) {
           // Send the user if no issues
-          res.send(students)
+          res.send(products)
         } else {
           // Send 404 header if the user doesn't exist
           res.send(404)
@@ -145,29 +143,29 @@ server.post('/sendPost', function (req, res, next) {
 
 
 //------------------------------------------------------------------------------//
-                      // Update a Student Record by their id
+                      // Update a product Record by their id
 //------------------------------------------------------------------------------//
 
-      server.put('/students/:id', function (req, res, next) {
+      server.put('/products/:id', function (req, res, next) {
       
         // Make sure name is defined
-        if (req.params.name === undefined ) {
+        if (req.params.product === undefined ) {
           // If there are any errors, pass them to next in the correct format
           return next(new restify.InvalidArgumentError('name must be supplied'))
         }
-        if (req.params.age === undefined ) {
+        if (req.params.price === undefined ) {
           // If there are any errors, pass them to next in the correct format
           return next(new restify.InvalidArgumentError('age must be supplied'))
         }
         
-        var newStudent = {
+        var newproduct = {
               _id: req.params.id,
-              name: req.params.name, 
-              age: req.params.age
+              product: req.params.product, 
+              price: req.params.price
         }
         
           // Update the user with the persistence engine
-          studentsSave.update(newStudent, function (error, student) {
+          productsSave.update(newproduct, function (error, product) {
       
           // If there are any errors, pass them to next in the correct format
           if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
@@ -180,13 +178,13 @@ server.post('/sendPost', function (req, res, next) {
       })
       
 //------------------------------------------------------------------------------//
-                       // Delete student record with the given id
+                       // Delete product record with the given id
 //------------------------------------------------------------------------------//
 
-server.del('/students/:id', function (req, res, next) {
+server.del('/products/:id', function (req, res, next) {
   
     // Delete the user with the persistence engine
-    studentsSave.delete(req.params.id, function (error, student) {
+    productsSave.delete(req.params.id, function (error, product) {
   
       console.log("Delete id:"+ req.params.id+ "received request..");
       
@@ -199,14 +197,14 @@ server.del('/students/:id', function (req, res, next) {
   })
   
 //------------------------------------------------------------------------------//
-                      // Delete all student records in the system
+                      // Delete all product records in the system
 //------------------------------------------------------------------------------//
 
 server.del('/sendDelete', function (req, res, next) {
   
         console.log("sendDelete: received request..");
 
-        studentsSave = require('save')('students')
+        productsSave = require('save')('products')
         
         res.send("All Records Delete");
    
